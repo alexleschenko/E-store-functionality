@@ -21,7 +21,7 @@
             <td>{{ i.comment }}</td>
             <td>
                 <a href="{% url 'admin' %}?action=del&id={{ i.id }}">Удалить</a>,
-                <a>Править</a>
+                <a href="{% url 'update' %}?id={{ i.id }}">Править</a>
             </td>
         </tr>
     {% endfor %}

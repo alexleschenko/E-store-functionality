@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^admin_page/$', admin, name='admin'),
     url(r'^$', order, name='order'),
     url(r'^login/$', login_site, name='login'),
-    url(r'^logout/$', logout_site, name='logout')
+    url(r'^logout/$', logout_site, name='logout'),
+    url(r'^admin_page/update/$', update, name='update')
 ]

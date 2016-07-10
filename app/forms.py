@@ -14,3 +14,7 @@ class UserForm(forms.Form):
 class Login(forms.Form):
     user = forms.CharField(label='user', max_length=100)
     password = forms.CharField(label='password', max_length=100, widget=forms.PasswordInput)
+
+class Update(forms.Form):
+    order = forms.CharField(label='Что купить', max_length=100)
+    comment = forms.CharField(label="Комментарии", widget=forms.Textarea, required=False)

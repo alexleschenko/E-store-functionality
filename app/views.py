@@ -83,3 +83,22 @@ def logout_site(request):
 
 
 
+def update(request):
+    if request.method == 'POST':
+        form = Update(request.POST)
+
+        if request.session.has_key('data'):
+            id = request.session.get('data')
+        del request.session['data']
+        if form.is_valid():
+            data = form.cleaned_data
+            UserDB.objects.filter(id=id).update(order=data['order'], comment=data['comment'])
+            return redirect('admin')
+        context = {'my_form': form}
+        return render(request, 'update.html', context)
+    else:
+        id = request.GET.get('id')
+        predata = UserDB.objects.filter(id=id).get()
+        request.session['data'] = id
+        context = {'my_form': Update(initial={'order': predata.order, 'comment':predata.comment})}
+        return render(request, 'update.html', context)
