@@ -20,7 +20,7 @@
             {% endif %}
             <td>{{ i.comment }}</td>
             <td>
-                <a>Удалить</a>,
+                <a href="{% url 'admin' %}?action=del&id={{ i.id }}">Удалить</a>,
                 <a>Править</a>
             </td>
         </tr>

@@ -1,9 +1,9 @@
+import arrow
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from forms import *
 from models import *
-import arrow
 
 # Create your views here.
 def order(request):
@@ -22,16 +22,23 @@ def order(request):
     else:
         time = arrow.now()
         time = time.format('HH')
-
         if time == '13' or time == '14':
             access = True
         else:
             access = False
-        context = {'my_form': UserForm(), 'access':access}
+        context = {'my_form': UserForm(), 'access': access}
         return render(request, 'user_form.html', context)
 
 
 def admin(request):
-    data = UserDB.objects.filter()
-    context = {'my_data': data}
-    return render(request, 'admin_list.html', context)
+    if request.GET.items():
+        action = request.GET.get('action')
+        id = request.GET.get('id')
+        if action == 'del':
+            UserDB.objects.filter(id=id).delete()
+            return redirect('admin')
+
+    else:
+        data = UserDB.objects.filter()
+        context = {'my_data': data}
+        return render(request, 'admin_list.html', context)
