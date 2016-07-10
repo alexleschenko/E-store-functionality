@@ -21,5 +21,7 @@ from app.views import *
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^admin_page/', admin, name='admin'),
-    url(r'^order/', order, name='order')
+    url(r'^order/', order, name='order'),
+    url(r'^login/', login_site, name='login'),
+    url(r'^logout/', logout_site, name='logout')
 ]
