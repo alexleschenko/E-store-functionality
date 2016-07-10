@@ -1,11 +1,12 @@
-#coding=utf-8
+# coding=utf-8
 import arrow
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 
 from forms import *
 from models import *
+
 
 # Create your views here.
 def order(request):
@@ -33,7 +34,6 @@ def order(request):
 
 
 def admin(request):
-
     if request.user.is_authenticated():
         if request.GET.items():
             action = request.GET.get('action')
@@ -44,10 +44,20 @@ def admin(request):
 
         else:
             data = UserDB.objects.filter()
-            context = {'my_data': data}
+            data_byn = UserDB.objects.filter(pay_method='byn')
+            value_byn = 0
+            for i in data_byn:
+                value_byn = value_byn + i.pay_value
+            data_byr = UserDB.objects.filter(pay_method='byr')
+            value_byr = 0
+            for i in data_byr:
+                value_byr = value_byr + i.pay_value
+            summ = value_byn + value_byr/10000
+            context = {'my_data': data, 'byn':value_byn, 'byr': value_byr, 'sum':summ}
             return render(request, 'admin_list.html', context)
     else:
         return redirect('login')
+
 
 def login_site(request):
     if request.method == 'POST':
@@ -67,20 +77,20 @@ def login_site(request):
             request.session['login'] = 'Неверный логин/пароль'
             return redirect('login')
 
-        context = {'my_form':form}
+        context = {'my_form': form}
         return render(request, 'login.html', context)
     else:
-        data=''
+        data = ''
         if request.session.has_key('login'):
             data = request.session.get('login')
             del request.session['login']
-        context = {'my_form':Login(), 'login_data':data}
+        context = {'my_form': Login(), 'login_data': data}
         return render(request, 'login.html', context)
+
 
 def logout_site(request):
     logout(request)
     return redirect('login')
-
 
 
 def update(request):
@@ -100,5 +110,5 @@ def update(request):
         id = request.GET.get('id')
         predata = UserDB.objects.filter(id=id).get()
         request.session['data'] = id
-        context = {'my_form': Update(initial={'order': predata.order, 'comment':predata.comment})}
+        context = {'my_form': Update(initial={'order': predata.order, 'comment': predata.comment})}
         return render(request, 'update.html', context)

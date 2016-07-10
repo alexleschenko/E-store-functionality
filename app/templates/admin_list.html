@@ -26,4 +26,22 @@
         </tr>
     {% endfor %}
 </table>
+<br><br><br>
+<table >
+    <tr>
+        <td>Оплачено в BYR</td>
+        <td>{{ byr }}</td>
+    </tr>
+    <tr>
+        <td>Оплачено в BNR</td>
+        <td>{{ byn }}</td>
+    </tr>
+    <tr>
+        <td>Сумма</td>
+        <td>{{ sum }}</td>
+    </tr>
+</table>
+
+<br><br><br>
+
 <a href="{% url 'logout' %}">Выйти со страницы</a>
