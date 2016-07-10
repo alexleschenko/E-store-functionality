@@ -21,3 +21,8 @@ def order(request):
         context = {'my_form':UserForm()}
         return render(request, 'user_form.html', context)
 
+def admin(request):
+    data = UserDB.objects.filter()
+    context = {'my_data':data}
+    return render(request, 'admin_list.html', context)
+

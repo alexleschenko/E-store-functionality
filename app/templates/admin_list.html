@@ -1,0 +1,28 @@
+<table border="1">
+    <tr bgcolor="#808080" align="center">
+        <td>Что купить</td>
+        <td>Кому</td>
+        <td>Оплачено BYR</td>
+        <td>Оплачено BNR</td>
+        <td>Комментарий</td>
+        <td>Действия с заказом</td>
+        </tr>
+    {% for i in my_data %}
+        <tr align="center">
+            <td>{{ i.order }}</td>
+            <td>{{ i.person }}</td>
+            {% if i.pay_method == 'byn' %}
+                <td>0</td>
+                <td>{{ i.pay_value }}</td>
+            {% else %}
+                <td>{{ i.pay_value }}</td>
+                <td>0</td>
+            {% endif %}
+            <td>{{ i.comment }}</td>
+            <td>
+                <a>Удалить</a>,
+                <a>Править</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
