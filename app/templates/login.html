@@ -1,6 +1,7 @@
 <p>{{ login_data }}</p>
 <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
     {{ my_form.as_p }}
-    {% csrf_token %}
+
     <input type="submit" value="Login">
 </form>

@@ -1,3 +1,5 @@
+<h3>Добро пожаловать!. Сделайте ваш заказ</h3>
+
 {% if access == True %}
 <form action="{% url 'order' %}" method="post">
     {{ my_form.as_p }}
@@ -12,3 +14,6 @@
     <input type="submit" value="Заказать" disabled>
 </form>
 {% endif %}
+
+<br>
+<a href="{% url 'login' %}"><b>Войти как администратор</b></a>

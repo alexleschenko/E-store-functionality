@@ -33,6 +33,7 @@ def order(request):
 
 
 def admin(request):
+
     if request.user.is_authenticated():
         if request.GET.items():
             action = request.GET.get('action')
