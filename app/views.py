@@ -1,7 +1,9 @@
-from forms import *
-from models import *
 from django.http import HttpResponse
 from django.shortcuts import render
+
+from forms import *
+from models import *
+import arrow
 
 # Create your views here.
 def order(request):
@@ -10,19 +12,26 @@ def order(request):
         if form.is_valid():
             data = form.cleaned_data
             UserDB.objects.create(order=data['order'], person=data['person'], email=data['email'],
-                                      comment=data['comment'],
-                                      pay_value=data['payment_value'], pay_method=data['payment_method'])
+                                  comment=data['comment'],
+                                  pay_value=data['payment_value'], pay_method=data['payment_method'])
 
             return HttpResponse('done')
         else:
-            context = {'my_form':form}
+            context = {'my_form': form}
             return render(request, 'user_form.html', context)
     else:
-        context = {'my_form':UserForm()}
+        time = arrow.now()
+        time = time.format('HH')
+
+        if time == '13' or time == '14':
+            access = True
+        else:
+            access = False
+        context = {'my_form': UserForm(), 'access':access}
         return render(request, 'user_form.html', context)
+
 
 def admin(request):
     data = UserDB.objects.filter()
-    context = {'my_data':data}
+    context = {'my_data': data}
     return render(request, 'admin_list.html', context)
-

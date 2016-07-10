@@ -9,4 +9,4 @@ class UserForm(forms.Form):
     email = forms.EmailField(label='Email')
     payment_value = forms.FloatField(label='Сумма')
     payment_method= forms.ChoiceField(label='Валюта', choices=choices)
-    comment = forms.CharField(label="Комментарии", widget=forms.Textarea)
+    comment = forms.CharField(label="Комментарии", widget=forms.Textarea, required=False)
