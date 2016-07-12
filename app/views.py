@@ -18,7 +18,7 @@ def order(request):
                                   comment=data['comment'],
                                   pay_value=data['payment_value'], pay_method=data['payment_method'])
 
-            return HttpResponse('done')
+            return redirect('order')
         else:
             context = {'my_form': form}
             return render(request, 'user_form.html', context)
