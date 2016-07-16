@@ -14,11 +14,6 @@ def order(request):
     time = arrow.now()
     time = time.format('HH')
     time = int(time)
-    if time >= 15:
-        access = False
-    else:
-        access = True
-    admin_us = User.objects.filter(username='admin').get()
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -27,6 +22,7 @@ def order(request):
                                   comment=data['comment'],
                                   pay_value=data['payment_value'], pay_method=data['payment_method'])
             user = UserDB.objects.filter().last()
+            admin_us = User.objects.filter(username='admin').get()
             if time >= 13:
                 message = u'Вам пришел новый заказ: \n 1) {0}, \n 2) {1}, \n 3) {2}, \n 4) {3} {4}, \n 5) {5}'.format(
                     data['order'],
@@ -42,6 +38,10 @@ def order(request):
             return render(request, 'user_form.html', context)
     else:
 
+        if time >= 15:
+            access = False
+        else:
+            access = True
         context = {'my_form': UserForm(), 'access': access}
         return render(request, 'user_form.html', context)
 
