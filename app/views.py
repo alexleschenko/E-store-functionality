@@ -112,30 +112,33 @@ def logout_site(request):
 
 
 def update(request):
-    if request.method == 'POST':
-        form = Update(request.POST)
-        admin_us = User.objects.filter(username='admin').get()
-        if request.session.has_key('data'):
-            id = request.session.get('data')
-        del request.session['data']
-        if form.is_valid():
-            data = form.cleaned_data
-            UserDB.objects.filter(id=id).update(order=data['order'], person=data['person'], email=data['email'],
-                                                comment=data['comment'],
-                                                pay_value=data['payment_value'],
-                                                pay_method=data['payment_method'])
-            user = UserDB.objects.filter(id=id).get()
-            order_update = u'Ваш заказ изменен администратором \n 1) {0} \n 2) {1}'.format(user.order, user.comment)
-            send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email])
-            return redirect('admin')
-        context = {'my_form': form}
-        return render(request, 'update.html', context)
+    if request.user.is_authenticated():
+        if request.method == 'POST':
+            form = Update(request.POST)
+            admin_us = User.objects.filter(username='admin').get()
+            if request.session.has_key('data'):
+                id = request.session.get('data')
+            del request.session['data']
+            if form.is_valid():
+                data = form.cleaned_data
+                UserDB.objects.filter(id=id).update(order=data['order'], person=data['person'], email=data['email'],
+                                                    comment=data['comment'],
+                                                    pay_value=data['payment_value'],
+                                                    pay_method=data['payment_method'])
+                user = UserDB.objects.filter(id=id).get()
+                order_update = u'Ваш заказ изменен администратором \n 1) {0} \n 2) {1}'.format(user.order, user.comment)
+                send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email])
+                return redirect('admin')
+            context = {'my_form': form}
+            return render(request, 'update.html', context)
+        else:
+            id = request.GET.get('id')
+            predata = UserDB.objects.filter(id=id).get()
+            request.session['data'] = id
+            context = {
+                'my_form': Update(initial={'order': predata.order, 'comment': predata.comment, 'person': predata.person,
+                                           'email': predata.email, 'payment_value': predata.pay_value,
+                                           'payment_method': predata.pay_method})}
+            return render(request, 'update.html', context)
     else:
-        id = request.GET.get('id')
-        predata = UserDB.objects.filter(id=id).get()
-        request.session['data'] = id
-        context = {
-            'my_form': Update(initial={'order': predata.order, 'comment': predata.comment, 'person': predata.person,
-                                       'email': predata.email, 'payment_value': predata.pay_value,
-                                       'payment_method': predata.pay_method})}
-        return render(request, 'update.html', context)
+        return redirect('login')
