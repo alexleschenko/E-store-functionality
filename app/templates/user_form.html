@@ -7,7 +7,7 @@
     <input type="submit" value="Заказать">
 </form>
 {% else %}
-    <h4>Пожалуйста, выполните заказ с 13:00 до 15:00</h4>
+    <h4>Пожалуйста, выполните заказ до 15:00</h4>
 <form action="{% url 'order' %}" method="post" >
     {{ my_form.as_p }}
     {% csrf_token %}

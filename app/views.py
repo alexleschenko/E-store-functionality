@@ -126,7 +126,7 @@ def update(request):
                                                     pay_value=data['payment_value'],
                                                     pay_method=data['payment_method'])
                 user = UserDB.objects.filter(id=id).get()
-                order_update = u'Ваш заказ изменен администратором \n 1) {0} \n 2) {1}'.format(user.order, user.comment)
+                order_update = u'Ваш заказ изменен администратором \n 1) заказ: {0} \n 2) комментарий: {1}'.format(user.order, user.comment)
                 send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email])
                 return redirect('admin')
             context = {'my_form': form}
