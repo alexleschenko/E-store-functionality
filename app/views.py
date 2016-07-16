@@ -1,7 +1,8 @@
 # coding=utf-8
 import arrow
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 
 from forms import *
@@ -10,6 +11,14 @@ from models import *
 
 # Create your views here.
 def order(request):
+    time = arrow.now()
+    time = time.format('HH')
+    time = int(time)
+    if time >= 15:
+        access = False
+    else:
+        access = True
+    admin_us = User.objects.filter(username='admin').get()
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -17,18 +26,22 @@ def order(request):
             UserDB.objects.create(order=data['order'], person=data['person'], email=data['email'],
                                   comment=data['comment'],
                                   pay_value=data['payment_value'], pay_method=data['payment_method'])
-
+            user = UserDB.objects.filter().last()
+            if time >= 13:
+                message = u'Вам пришел новый заказ: \n 1) {0}, \n 2) {1}, \n 3) {2}, \n 4) {3} {4}, \n 5) {5}'.format(
+                    data['order'],
+                    data['person'],
+                    data['comment'],
+                    data['payment_value'],
+                    data['payment_method'],
+                    data['email'])
+                send_mail('Новый заказ', message, user.email, [admin_us.email])
             return redirect('order')
         else:
             context = {'my_form': form}
             return render(request, 'user_form.html', context)
     else:
-        time = arrow.now()
-        time = time.format('HH')
-        if time == '13' or time == '14':
-            access = True
-        else:
-            access = False
+
         context = {'my_form': UserForm(), 'access': access}
         return render(request, 'user_form.html', context)
 
@@ -39,6 +52,11 @@ def admin(request):
             action = request.GET.get('action')
             id = request.GET.get('id')
             if action == 'del':
+                admin_us = User.objects.filter(username='admin').get()
+                user = UserDB.objects.filter(id=id).get()
+
+                send_mail('Ваш заказ удален администратором', 'Ваш заказ удален администратором', admin_us.email,
+                          [user.email])
                 UserDB.objects.filter(id=id).delete()
                 return redirect('admin')
 
@@ -52,8 +70,8 @@ def admin(request):
             value_byr = 0
             for i in data_byr:
                 value_byr = value_byr + i.pay_value
-            summ = value_byn + value_byr/10000
-            context = {'my_data': data, 'byn':value_byn, 'byr': value_byr, 'sum':summ}
+            summ = value_byn + value_byr / 10000
+            context = {'my_data': data, 'byn': value_byn, 'byr': value_byr, 'sum': summ}
             return render(request, 'admin_list.html', context)
     else:
         return redirect('login')
@@ -96,13 +114,19 @@ def logout_site(request):
 def update(request):
     if request.method == 'POST':
         form = Update(request.POST)
-
+        admin_us = User.objects.filter(username='admin').get()
         if request.session.has_key('data'):
             id = request.session.get('data')
         del request.session['data']
         if form.is_valid():
             data = form.cleaned_data
-            UserDB.objects.filter(id=id).update(order=data['order'], comment=data['comment'])
+            UserDB.objects.filter(id=id).update(order=data['order'], person=data['person'], email=data['email'],
+                                                comment=data['comment'],
+                                                pay_value=data['payment_value'],
+                                                pay_method=data['payment_method'])
+            user = UserDB.objects.filter(id=id).get()
+            order_update = u'Ваш заказ изменен администратором \n 1) {0} \n 2) {1}'.format(user.order, user.comment)
+            send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email])
             return redirect('admin')
         context = {'my_form': form}
         return render(request, 'update.html', context)
@@ -110,5 +134,8 @@ def update(request):
         id = request.GET.get('id')
         predata = UserDB.objects.filter(id=id).get()
         request.session['data'] = id
-        context = {'my_form': Update(initial={'order': predata.order, 'comment': predata.comment})}
+        context = {
+            'my_form': Update(initial={'order': predata.order, 'comment': predata.comment, 'person': predata.person,
+                                       'email': predata.email, 'payment_value': predata.pay_value,
+                                       'payment_method': predata.pay_method})}
         return render(request, 'update.html', context)
