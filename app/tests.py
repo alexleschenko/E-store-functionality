@@ -1,3 +1,4 @@
+#coding=utf-8
 import json
 
 from django.core import serializers
@@ -16,7 +17,7 @@ def new_render(a, b, c):
 
 # Create your tests here.
 class ProjectTest(TestCase):
-    def test_ok_add_order(self):
+    def test_ok_add_order(self): #тест добавление
         data = {'order': 'data', 'person': 'person', 'email': 'mail@mail.com', 'payment_value': 1000,
                 'payment_method': 'byn', 'comment': 'blablabla'}
         User.objects.create_user('admin', 'lennon@the.com', 'testpassword')
@@ -31,7 +32,7 @@ class ProjectTest(TestCase):
         self.assertEquals(order.pay_value, data['payment_value'])
         self.assertEquals(order.comment, data['comment'])
 
-    def test_ok_update(self):
+    def test_ok_update(self): #тест обновление
         User.objects.create_user('admin', 'lennon@the.com', 'testpassword', is_active=True)
         self.client.login(username='admin', password='testpassword')
         UserDB.objects.create(order='order', person='person', email='email@email.com', pay_value=100, pay_method='byn',
@@ -45,7 +46,7 @@ class ProjectTest(TestCase):
         self.assertEquals(order.order, data['order'])
         self.assertEquals(order.comment, data['comment'])
 
-    def test_ok_delete(self):
+    def test_ok_delete(self): # тест удаление
         User.objects.create_user('admin', 'lennon@the.com', 'testpassword', is_active=True)
         self.client.login(username='admin', password='testpassword')
         UserDB.objects.create(order='order', person='person', email='email@email.com', pay_value=100, pay_method='byn',
@@ -55,7 +56,7 @@ class ProjectTest(TestCase):
         q_order = UserDB.objects.filter()
         self.assertEquals(q_order.count(), 0)
 
-    def test_ok_sum_payment(self):
+    def test_ok_sum_payment(self): #тест подсчета суммы
         with patch('app.views.render', new=new_render):
             User.objects.create_user('admin', 'lennon@the.com', 'testpassword', is_active=True)
             self.client.login(username='admin', password='testpassword')

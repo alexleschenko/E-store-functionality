@@ -11,7 +11,7 @@ from models import *
 
 # Create your views here.
 def order(request):
-    time = arrow.now()
+    time = arrow.now() #подсчет времени
     time = time.format('HH')
     time = int(time)
     if request.method == 'POST':
@@ -23,7 +23,7 @@ def order(request):
                                   pay_value=data['payment_value'], pay_method=data['payment_method'])
             user = UserDB.objects.filter().last()
             admin_us = User.objects.filter(username='admin').get()
-            if time >= 13:
+            if time >= 13: #отсылка письма после 13 00
                 message = u'Вам пришел новый заказ: \n 1) {0}, \n 2) {1}, \n 3) {2}, \n 4) {3} {4}, \n 5) {5}'.format(
                     data['order'],
                     data['person'],
@@ -37,7 +37,7 @@ def order(request):
             context = {'my_form': form}
             return render(request, 'user_form.html', context)
     else:
-
+        # условия запрета отправки заказа
         if time >= 15:
             access = False
         else:
@@ -51,7 +51,7 @@ def admin(request):
         if request.GET.items():
             action = request.GET.get('action')
             id = request.GET.get('id')
-            if action == 'del':
+            if action == 'del': #удаление записи и отправка письма
                 admin_us = User.objects.filter(username='admin').get()
                 user = UserDB.objects.filter(id=id).get()
 
@@ -63,7 +63,7 @@ def admin(request):
         else:
             data = UserDB.objects.filter()
             data_byn = UserDB.objects.filter(pay_method='byn')
-            value_byn = 0
+            value_byn = 0 #подсчет оплаты
             for i in data_byn:
                 value_byn = value_byn + i.pay_value
             data_byr = UserDB.objects.filter(pay_method='byr')
@@ -77,7 +77,7 @@ def admin(request):
         return redirect('login')
 
 
-def login_site(request):
+def login_site(request): #аутентификация пользователя
     if request.method == 'POST':
         form = Login(request.POST)
         if form.is_valid():
@@ -106,12 +106,12 @@ def login_site(request):
         return render(request, 'login.html', context)
 
 
-def logout_site(request):
+def logout_site(request): #выход со страницы администратора
     logout(request)
     return redirect('login')
 
 
-def update(request):
+def update(request): #обновление записи
     if request.user.is_authenticated():
         if request.method == 'POST':
             form = Update(request.POST)
@@ -127,7 +127,7 @@ def update(request):
                                                     pay_method=data['payment_method'])
                 user = UserDB.objects.filter(id=id).get()
                 order_update = u'Ваш заказ изменен администратором \n 1) заказ: {0} \n 2) комментарий: {1}'.format(user.order, user.comment)
-                send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email])
+                send_mail('Ваш заказ изменен администратором', order_update, admin_us.email, [user.email]) #отправка письма
                 return redirect('admin')
             context = {'my_form': form}
             return render(request, 'update.html', context)
