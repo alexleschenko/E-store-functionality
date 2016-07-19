@@ -23,7 +23,7 @@ def order(request):
                                   pay_value=data['payment_value'], pay_method=data['payment_method'])
             user = UserDB.objects.filter().last()
             admin_us = User.objects.filter(username='admin').get()
-            if time >= 13: #отсылка письма после 13 00
+            if time >= 13: #отсылка письма после 13 00 (через backend)
                 message = u'Вам пришел новый заказ: \n 1) {0}, \n 2) {1}, \n 3) {2}, \n 4) {3} {4}, \n 5) {5}'.format(
                     data['order'],
                     data['person'],
